@@ -1,0 +1,665 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Financial Assistance Scheme Management System API",
+        "version": "1.0.0",
+        "description": "API for managing applicants, applications, and schemes in a financial assistance scheme management system."
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000",
+            "description": "Local development server"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ],
+    "paths": {
+        "/api/mockLogin": {
+            "post": {
+                "summary": "Mock login to generate JWT token",
+                "description": "This endpoint is used for logging in and generating a JWT token. Note: For illustration purposes only; email should be retrieved from SSO callback in a real application.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "description": "The email of the administrator to log in"
+                                    }
+                                },
+                                "required": [
+                                    "email"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful, JWT token returned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "description": "JWT token to be used for authenticated requests"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "User does not exist",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "User does not exist"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Server error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/applicants": {
+            "get": {
+                "summary": "Get all applicants with pagination",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of applicants to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Number of applicants to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A paginated list of applicants",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "limit": {
+                                            "type": "integer"
+                                        },
+                                        "offset": {
+                                            "type": "integer"
+                                        },
+                                        "applicants": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Applicant"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new applicant",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewApplicant"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Applicant created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Applicant"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes": {
+            "get": {
+                "summary": "Get all schemes with pagination",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of schemes to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Number of schemes to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A paginated list of schemes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "limit": {
+                                            "type": "integer"
+                                        },
+                                        "offset": {
+                                            "type": "integer"
+                                        },
+                                        "schemes": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Scheme"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/schemes/eligible": {
+            "get": {
+                "summary": "Get all schemes that an applicant is eligible to apply for",
+                "parameters": [
+                    {
+                        "name": "applicant",
+                        "in": "query",
+                        "description": "Applicant ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A list of eligible schemes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "eligible_schemes": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Scheme"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/applications": {
+            "get": {
+                "summary": "Get all applications with pagination",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of applications to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Number of applications to skip",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A paginated list of applications",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "limit": {
+                                            "type": "integer"
+                                        },
+                                        "offset": {
+                                            "type": "integer"
+                                        },
+                                        "applications": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Application"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create a new application",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewApplication"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Application created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Application"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Applicant is not eligible for this scheme or invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Applicant or scheme not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
+        "schemas": {
+            "Applicant": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "nric": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "sex": {
+                        "type": "string"
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "marital_status": {
+                        "type": "string"
+                    },
+                    "employment_status": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "household_members": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/HouseholdMember"
+                        }
+                    }
+                }
+            },
+            "NewApplicant": {
+                "type": "object",
+                "required": [
+                    "nric",
+                    "name",
+                    "sex",
+                    "date_of_birth",
+                    "marital_status",
+                    "employment_status"
+                ],
+                "properties": {
+                    "nric": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "sex": {
+                        "type": "string"
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "marital_status": {
+                        "type": "string",
+                        "enum": [
+                            "Single",
+                            "Married",
+                            "Widowed",
+                            "Divorced"
+                        ]
+                    },
+                    "employment_status": {
+                        "type": "string",
+                        "enum": [
+                            "Employed",
+                            "Unemployed"
+                        ]
+                    },
+                    "household_members": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/NewHouseholdMember"
+                        }
+                    }
+                }
+            },
+            "HouseholdMember": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "sex": {
+                        "type": "string"
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "relationship": {
+                        "type": "string"
+                    },
+                    "employment_status": {
+                        "type": "string"
+                    },
+                    "age": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "NewHouseholdMember": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "sex",
+                    "date_of_birth",
+                    "relationship",
+                    "employment_status"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "sex": {
+                        "type": "string"
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "relationship": {
+                        "type": "string"
+                    },
+                    "employment_status": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Scheme": {
+                "type": "object",
+                "properties": {
+                    "scheme_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "scheme_name": {
+                        "type": "string"
+                    },
+                    "scheme_description": {
+                        "type": "string"
+                    },
+                    "scheme_status": {
+                        "type": "string"
+                    },
+                    "scheme_created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "criteria": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SchemeCriteria"
+                        }
+                    },
+                    "benefits": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SchemeBenefit"
+                        }
+                    }
+                }
+            },
+            "SchemeCriteria": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "applicable_to": {
+                        "type": "string"
+                    },
+                    "marital_status": {
+                        "type": "string"
+                    },
+                    "employment_status": {
+                        "type": "string"
+                    },
+                    "relationship": {
+                        "type": "string"
+                    },
+                    "age_min": {
+                        "type": "integer"
+                    },
+                    "age_max": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "SchemeBenefit": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "applicable_to": {
+                        "type": "string"
+                    },
+                    "criteria_relationship": {
+                        "type": "string"
+                    },
+                    "criteria_age_min": {
+                        "type": "integer"
+                    },
+                    "criteria_age_max": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "Application": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "applicant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "scheme_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "application_status": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "NewApplication": {
+                "type": "object",
+                "required": [
+                    "applicant_id",
+                    "scheme_id"
+                ],
+                "properties": {
+                    "applicant_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "scheme_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            }
+        }
+    }
+}

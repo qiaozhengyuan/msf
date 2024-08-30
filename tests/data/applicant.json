@@ -1,0 +1,24 @@
+{
+    "nric": "S8888888J",
+    "name": "AppMain",
+    "sex": "Male",
+    "date_of_birth": "1988-08-08",
+    "marital_status": "Divorced",
+    "employment_status": "Unemployed",
+    "household_members": [
+        {
+            "name": "AppChild1",
+            "sex": "Male",
+            "date_of_birth": "2018-02-07",
+            "relationship": "Child",
+            "employment_status": "Unemployed"
+        },
+        {
+            "name": "AppChild2",
+            "sex": "Male",
+            "date_of_birth": "2020-03-09",
+            "relationship": "Child",
+            "employment_status": "Unemployed"
+        }
+    ]
+}
