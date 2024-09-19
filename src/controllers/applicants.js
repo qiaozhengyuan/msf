@@ -18,8 +18,8 @@ const getApplicants = async (req, res, next) => {
 
 const createApplicant = async (req, res, next) => {
     try {
-        const { nric, name, sex, date_of_birth, marital_status, employment_status, household_members } = req.body;
-        const applicantData = { nric, name, sex, date_of_birth, marital_status, employment_status };
+        const { nric, name, sex, date_of_birth, marital_status, employment_status, date_unemployed, household_members } = req.body;
+        const applicantData = { nric, name, sex, date_of_birth, marital_status, employment_status, date_unemployed };
         const newApplicant = await applicantModel.addNewApplicant(applicantData, household_members);
         res.status(201).json(newApplicant);
     } catch (err) {

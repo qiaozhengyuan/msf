@@ -14,6 +14,7 @@ const getSchemes = async (limit, offset) => {
                     'applicable_to', sc.applicable_to,
                     'marital_status', sc.marital_status,
                     'employment_status', sc.employment_status,
+                    'age_unemployed_max', sc.age_unemployed_max,
                     'relationship', sc.relationship,
                     'age_min', sc.age_min,
                     'age_max', sc.age_max
@@ -58,6 +59,7 @@ const getActiveSchemes = async () => {
                     'applicable_to', sc.applicable_to,
                     'marital_status', sc.marital_status,
                     'employment_status', sc.employment_status,
+                    'age_unemployed_max', sc.age_unemployed_max,
                     'relationship', sc.relationship,
                     'age_min', sc.age_min,
                     'age_max', sc.age_max
@@ -96,6 +98,7 @@ const getSchemeByID = async (id) => {
                     'applicable_to', sc.applicable_to,
                     'marital_status', sc.marital_status,
                     'employment_status', sc.employment_status,
+                    'age_unemployed_max', sc.age_unemployed_max,
                     'relationship', sc.relationship,
                     'age_min', sc.age_min,
                     'age_max', sc.age_max

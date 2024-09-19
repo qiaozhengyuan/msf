@@ -1,5 +1,18 @@
+
+//   Implemented: Criteria1 && Criteria2 
+
+//   Could be: CriteriaSet1 = Criteria1 || Criteria2 ...
+//             Eligibility = CriteriaSet1 && CriteriaSet2 ...
+
+
+// conditions: {
+//     "marital_status":"married",
+//     "employment_status":"unemployed"
+// },
+
+
 const checkEligibility = (applicant, scheme) => {
-    const { marital_status, employment_status, household_members } = applicant;
+    const { marital_status, employment_status, date_unemployed, household_members } = applicant;
 
     let isEligible = true;
 
@@ -9,6 +22,11 @@ const checkEligibility = (applicant, scheme) => {
                 isEligible = false;
             }
             if (criterion.employment_status && criterion.employment_status !== employment_status) {
+                isEligible = false;
+            }
+            const age_unemployed = calculateAgeInMonth(date_unemployed);
+            console.log("Applicant age unemployed", age_unemployed, criterion.age_unemployed_max);
+            if (criterion.age_unemployed_max && criterion.age_unemployed_max < age_unemployed) {
                 isEligible = false;
             }
         } else if (criterion.applicable_to === "Household member") {
@@ -37,6 +55,19 @@ const checkEligibility = (applicant, scheme) => {
     }
 
     return isEligible;
+};
+
+const calculateAgeInMonth = (dateInEffect) => {
+    if (!dateInEffect) {
+        return today.getFullYear() * 12;
+    }
+    const dateie = new Date(dateInEffect);
+    const today = new Date();
+
+    let age = today.getFullYear() - dateie.getFullYear();
+    const monthDiff = today.getMonth() - dateie.getMonth();
+
+    return age * 12 + monthDiff;
 };
 
 const calculateAge = (dateOfBirth) => {

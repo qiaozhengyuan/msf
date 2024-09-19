@@ -10,6 +10,7 @@ const getApplicants = async (limit, offset) => {
             TO_CHAR(a.date_of_birth, 'YYYY-MM-DD') AS applicant_date_of_birth,
             a.marital_status,
             a.employment_status,
+            a.date_unemployed,
             a.created_at AS applicant_created_at,
             json_agg(
                 json_build_object(
@@ -39,14 +40,14 @@ const addNewApplicant = async (applicant, household_members) => {
     const client = await dbPool.connect();
     await client.query('BEGIN'); // Begin transaction
     try {
-        const { nric, name, sex, date_of_birth, marital_status, employment_status } = applicant;
+        const { nric, name, sex, date_of_birth, marital_status, employment_status, date_unemployed } = applicant;
 
         const applicantResult = await client.query(
             `INSERT INTO Applicants 
-            (nric, name, sex, date_of_birth, marital_status, employment_status) 
-            VALUES ($1, $2, $3, $4, $5, $6) 
+            (nric, name, sex, date_of_birth, marital_status, employment_status, date_unemployed) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7) 
             RETURNING *`,
-            [nric, name, sex, date_of_birth, marital_status, employment_status]
+            [nric, name, sex, date_of_birth, marital_status, employment_status, date_unemployed]
         );
         const createdApplicant = applicantResult.rows[0];
 
@@ -82,6 +83,7 @@ const addNewApplicant = async (applicant, household_members) => {
             date_of_birth: createdApplicant.date_of_birth,
             marital_status: createdApplicant.marital_status,
             employment_status: createdApplicant.employment_status,
+            date_unemployed: createdApplicant.date_unemployed,
             created_at: createdApplicant.created_at,
             household_members: householdMembers,
         };
@@ -103,6 +105,7 @@ const getApplicantByID = async (id) => {
             a.date_of_birth AS applicant_date_of_birth,
             a.marital_status,
             a.employment_status,
+            a.date_unemployed,
             json_agg(
                 json_build_object(
                     'id', h.id,

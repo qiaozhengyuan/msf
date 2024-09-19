@@ -22,6 +22,7 @@ CREATE TABLE Applicants (
     date_of_birth DATE NOT NULL,
     marital_status marital_status_enum NOT NULL,
     employment_status employment_status_enum NOT NULL,
+    date_unemployed DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -52,6 +53,7 @@ CREATE TABLE SchemeCriteria (
     applicable_to VARCHAR(50),
     marital_status marital_status_enum,
     employment_status employment_status_enum,
+    age_unemployed_max INTEGER,
     relationship VARCHAR(50),
     age_min INTEGER,
     age_max INTEGER

@@ -414,6 +414,10 @@
                     "employment_status": {
                         "type": "string"
                     },
+                    "date_unemployed": {
+                        "type": "string",
+                        "format": "date"
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time"
@@ -465,6 +469,10 @@
                             "Employed",
                             "Unemployed"
                         ]
+                    },
+                    "date_unemployed": {
+                        "type": "string",
+                        "format": "date"
                     },
                     "household_members": {
                         "type": "array",
@@ -579,6 +587,9 @@
                     },
                     "employment_status": {
                         "type": "string"
+                    },
+                    "age_unemployed_max": {
+                        "type": "integer"
                     },
                     "relationship": {
                         "type": "string"
